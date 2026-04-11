@@ -1,0 +1,22 @@
+{
+  "package_id": "com.dalff.storywalk",
+  "edition": "202601",
+  "name": "StoryWalk",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "min_sdk_version": "0.0.9",
+  "tagline": "Stories of the places around you",
+  "description": "Contextual tourism and running companion. Discover historic sites, monuments and landmarks as you walk or run, powered by OpenStreetMap and Wikipedia.",
+  "author": "Dalff",
+  "entrypoint": "index.html",
+  "supported_languages": ["en", "es"],
+  "permissions": [
+    {
+      "name": "network",
+      "desc": "Polls the StoryWalk backend for nearby POIs and summaries.",
+      "whitelist": [
+        "*"
+      ]
+    }
+  ]
+}

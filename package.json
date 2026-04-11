@@ -1,0 +1,29 @@
+{
+  "name": "storywalk-g2",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "sim": "evenhub-simulator http://localhost:5178",
+    "pack": "npm run build && node -e \"const v=require('./package.json').version; require('child_process').execSync('evenhub pack app.json dist -o storywalk-v'+v+'.ehpk', {stdio:'inherit'})\""
+  },
+  "dependencies": {
+    "@evenrealities/even_hub_sdk": "^0.0.9",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "upng-js": "^2.1.0"
+  },
+  "devDependencies": {
+    "@evenrealities/evenhub-cli": "^0.1.11",
+    "@evenrealities/evenhub-simulator": "^0.6.2",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@types/upng-js": "^2.1.5",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}
