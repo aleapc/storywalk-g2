@@ -3,6 +3,8 @@
 // and see the POI feed streaming in from storywalk-mobile.
 
 import { useEffect, useState, useCallback } from 'react'
+// (setInterval-based rerender removed — the POI feed already re-renders
+//  reactively via state mutation; polling here was redundant.)
 import type { EvenAppBridge } from '@evenrealities/even_hub_sdk'
 import type { StoryWalkState } from './state'
 import { modeLabel, categoryLabel } from './state'
@@ -19,13 +21,6 @@ interface AppProps {
 export function App({ bridge, state }: AppProps) {
   const [backendUrl, setBackendUrl] = useState(state.backendUrl)
   const [lang, setLang] = useState<'en' | 'pt' | 'es'>(state.lang)
-  const [tick, setTick] = useState(0)
-
-  // Force re-render every 2s so the POI feed stays reasonably fresh.
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 2000)
-    return () => clearInterval(id)
-  }, [])
 
   useEffect(() => {
     ;(async () => {
@@ -69,9 +64,6 @@ export function App({ bridge, state }: AppProps) {
     },
     [bridge, state],
   )
-
-  // Track tick so unused-var isn't flagged
-  void tick
 
   return (
     <div style={styles.root}>

@@ -7,7 +7,7 @@ import { waitForEvenAppBridge } from '@evenrealities/even_hub_sdk'
 import { createRoot } from 'react-dom/client'
 import { createElement } from 'react'
 import { App } from './app'
-import { initialState } from './state'
+import { initialState, nextMode } from './state'
 import type { StoryWalkState } from './state'
 import { renderScreen } from './glasses/renderer'
 import { setupEventHandler } from './glasses/events'
@@ -23,8 +23,11 @@ function startPolling(bridge: ReturnType<typeof waitForEvenAppBridge> extends Pr
   const tick = async () => {
     if (!state.backendUrl) return
     pollAbort?.abort()
-    pollAbort = new AbortController()
-    const snap = await fetchSnapshot(state.backendUrl, pollAbort.signal)
+    const localAbort = new AbortController()
+    pollAbort = localAbort
+    const snap = await fetchSnapshot(state.backendUrl, localAbort.signal)
+    // Bail out if foregroundExit cancelled polling while the fetch was inflight.
+    if (localAbort.signal.aborted || pollHandle == null) return
     if (!snap) {
       state.backendOk = false
       renderScreen(bridge, state)
@@ -105,11 +108,14 @@ async function init() {
       stopPolling()
     },
     onTripleTap: () => {
-      try {
-        bridge.shutDownPageContainer(0)
-      } catch (err) {
-        console.warn('shutDownPageContainer failed:', err)
-      }
+      // Triple-tap cycles the active mode (previously bound to double-tap).
+      // Double-tap is now reserved for the native exit dialog on root screens.
+      state.mode = nextMode(state.mode)
+      state.screen = state.mode
+      state.selectedPoiIndex = 0
+      state.detailPage = 0
+      state.isFirstRender = false
+      renderScreen(bridge, state)
     },
   })
 

@@ -6,7 +6,6 @@
 
 import type { EvenAppBridge, EvenHubEvent } from '@evenrealities/even_hub_sdk'
 import type { StoryWalkState } from '../state'
-import { nextMode } from '../state'
 import { renderScreen } from './renderer'
 import { totalDetailPages } from './screens'
 
@@ -119,19 +118,23 @@ function handleAction(
   state: StoryWalkState,
   action: ParsedAction,
 ): void {
-  // Double-tap cycles mode in all non-detail screens, returns from detail.
+  // Double-tap on a root (mode) screen triggers the native exit dialog via
+  // shutDownPageContainer(1). On non-root screens (e.g. detail) it acts as
+  // goBack to the owning mode screen. Mode cycling was moved to triple-tap.
   if (action === 'doubleClick') {
     if (state.screen === 'detail') {
       state.screen = state.mode
       state.detailPage = 0
-    } else {
-      state.mode = nextMode(state.mode)
-      state.screen = state.mode
-      state.selectedPoiIndex = 0
-      state.detailPage = 0
+      state.isFirstRender = false
+      renderScreen(bridge, state)
+      return
     }
-    state.isFirstRender = false
-    renderScreen(bridge, state)
+    // Root screen: request native exit dialog.
+    try {
+      void bridge.shutDownPageContainer(1)
+    } catch (err) {
+      console.warn('shutDownPageContainer failed:', err)
+    }
     return
   }
 
